@@ -985,9 +985,9 @@ TalentsInspecting = 1
 #        Default: 3
 #
 #    Corpse.EmptyLootShow
-#        If target can have loot (or can be skining after loot) but no loot generated still show loot window
-#        Default: 1 (show)
-#                 0 (not show)
+#        If corpse can have loot (or can be skinned after being looted) but no loot was generated still show empty loot window
+#        Default: 0 (not show)
+#                 1 (show)
 #
 #    Corpse.AllowAllItemsShowInMasterLoot
 #        In master loot mode every one can see the loot content under or over treshold
@@ -1066,7 +1066,7 @@ CreatureCheckForHelpRadius = 5
 CreatureCheckForHelpAggroDelay = 2000
 CreatureFamilyFleeDelay = 10000
 WorldBossLevelDiff = 3
-Corpse.EmptyLootShow = 1
+Corpse.EmptyLootShow = 0
 Corpse.AllowAllItemsShowInMasterLoot = 1
 Corpse.Decay.NORMAL = 300
 Corpse.Decay.RARE = 900
