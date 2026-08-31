@@ -31,6 +31,7 @@ enum
     SAY_ENRAGE             = -1189002,
     SAY_KILL               = -1189003,
     EMOTE_GENERIC_ENRAGED  = -1000003,
+    GENERIC_EMOTE_FLEE     = 1150,
 
     SAY_TRAINEE_SPAWN      = -1189035,
 
@@ -93,8 +94,8 @@ struct boss_herodAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        // If we are < 30% hp enrage
-        if (!m_bEnrage && m_creature->GetHealthPercent() <= 30.0f && !m_creature->IsNonMeleeSpellCasted(false))
+        // If we are < 50% hp enrage
+        if (!m_bEnrage && m_creature->GetHealthPercent() <= 50.0f && !m_creature->IsNonMeleeSpellCasted(false))
         {
             if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
             {
@@ -142,8 +143,13 @@ struct mob_scarlet_traineeAI : public npc_escortAI
     }
 
     uint32 m_uiStartTimer;
+    bool m_hasFled;
 
-    void Reset() override { }
+    void Reset() override
+    {
+        m_hasFled = false;
+    }
+
     void WaypointReached(uint32 /*uiPointId*/) override {}
 
     void UpdateEscortAI(const uint32 uiDiff) override
@@ -161,6 +167,16 @@ struct mob_scarlet_traineeAI : public npc_escortAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
+
+        // Flee at 15% HP
+        if (m_creature->GetHealthPercent() <= 15.0f && !m_hasFled)
+        {
+            if (m_creature->AI()->DoFlee())
+            {
+                DoBroadcastText(GENERIC_EMOTE_FLEE, m_creature);
+                m_hasFled = true;
+            }
+        }
 
         DoMeleeAttackIfReady();
     }
