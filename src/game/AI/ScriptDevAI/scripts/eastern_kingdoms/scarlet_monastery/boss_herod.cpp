@@ -36,7 +36,7 @@ enum
     SAY_TRAINEE_SPAWN      = -1189035,
 
     SPELL_RUSHINGCHARGE    = 8260,
-    SPELL_CLEAVE           = 15496,
+    SPELL_CLEAVE           = 15496, // 22540 in classic
     SPELL_WHIRLWIND        = 8989,
     SPELL_FRENZY           = 8269,
 
@@ -52,20 +52,21 @@ struct boss_herodAI : public ScriptedAI
 
     uint32 m_uiCleaveTimer;
     uint32 m_uiWhirlwindTimer;
+    uint32 m_uiRushingChargeTimer;
 
     void Reset() override
     {
         m_bTraineeSay = false;
         m_bEnrage     = false;
 
-        m_uiCleaveTimer    = 7500;
-        m_uiWhirlwindTimer = 14500;
+        m_uiCleaveTimer    = urand(3000, 15000);
+        m_uiWhirlwindTimer = urand(10000, 15000);
+        m_uiRushingChargeTimer = urand(0, 5000);
     }
 
     void Aggro(Unit* /*pWho*/) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
-        DoCastSpellIfCan(m_creature, SPELL_RUSHINGCHARGE);
     }
 
     void SummonedCreature(Creature* pSummoned)
@@ -105,11 +106,10 @@ struct boss_herodAI : public ScriptedAI
             }
         }
 
-        // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
             DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
-            m_uiCleaveTimer = urand(7500, 17500);
+            m_uiCleaveTimer = urand(8000, 24000);
         }
         else
             m_uiCleaveTimer -= uiDiff;
@@ -124,6 +124,17 @@ struct boss_herodAI : public ScriptedAI
         }
         else
             m_uiWhirlwindTimer -= uiDiff;
+
+        if (m_uiRushingChargeTimer < uiDiff)
+        {
+            if (m_creature->IsInRange(m_creature->GetVictim(), 10.0f, 100.0f, true, true))
+            {
+                DoCastSpellIfCan(nullptr, SPELL_RUSHINGCHARGE);
+                m_uiRushingChargeTimer = urand(5000, 10000);
+            }
+        }
+        else
+            m_uiRushingChargeTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
